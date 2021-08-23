@@ -1,0 +1,385 @@
+{% extends 'base.html' %}
+{% block title %} Home {% endblock %}
+{% block body %}
+
+
+<!-- calculate the lens and upload the csv files -->
+ <div class="card card-body col-md-2" style="float:left">
+        <form action="{{url_for('length')}}" method="POST">
+            <input type="text" class="form-control" name="len_series" placeholder="len">
+            <button type='submit' value='submit' class="btn btn-primary btn-block btn-sm" >Calculate length</button>
+        </form>
+     {{lens}}
+     <form method="POST" action="{{url_for('upload')}}" enctype="multipart/form-data">
+                    <p><input type="file" name="file"></p>
+                    <p><input type="submit" value="Submit"></p>
+     </form>
+</div>
+
+
+
+<div class="container">
+    <div class="row">
+        <div class="col md-12">
+            <div style="overflow-y:auto" class="jumbotron p-3">
+            <div class="well text-center">
+            <!-- add new data to data to data base manually -->
+            <h1><button type="button"  class="btn btn-success float-left"
+                data-toggle="modal" data-target="#mymodal">Add New Data</button> </h1>
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                {% for message in messages %}
+        <div class="alert alert-success alert-dismissable" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="close">
+                        <span aria-hidden="true">x</span>
+                    </button>
+                {{message}}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+        <!-- search function -->
+        <form action="{{url_for('search')}}" method="POST" class="float-right">
+                <input type="text"  name="search_string">
+                <button class="btn btn-primary " type="submit">Search</button>
+        </form>
+                <!-- table head -->
+                <table class="table table-hover table-dark">
+                    <thead>
+                    <tr>
+                        <th >action</th>
+                        <th >ec_number</th>
+                        <th >uniprot</th>
+                        <th >organism</th>
+                        <th >substrate_kinetics</th>
+                        <th >temperature</th>
+                        <th >clean_mut_wt</th>
+                        <th >kcat_mut</th>
+                        <th >select_key</th>
+                        <th >Km_mut</th>
+                        <th >select_key_1</th>
+                        <th >kcat_wt</th>
+                        <th >Km_wt</th>
+                        <th >PDBID</th>
+                        <th >pdb_as</th>
+                        <th >Mutant</th>
+                        <th >dG_mut</th>
+                        <th >dG_wt</th>
+                        <th >ddG</th>
+                        <th >Y</th>
+                        <th >wt</th>
+                        <th >mut</th>
+                        <th >wt_aa</th>
+                        <th >mut_aa</th>
+                        <th >compare_key</th>
+                        <th >reaction_kcat</th>
+                    </tr>
+                    </thead>
+
+
+                   {% for row in chem_data %}
+                    <tr>
+                        <td>
+                            <a href="/update/{{row.select_key}}" class="btn btn-warning btn-xs" data-toggle="modal" data-target="#modaledit{{row.id}}">Edit</a>
+                            <a href="/delete/{{row.select_key}}" class="btn btn-danger btn-xs" onclick="return confirm('Are You Sure To Delete ?')">Delete</a>
+                        </td>
+                        <td>{{row.ec_number}}</td>
+                        <td>{{row.uniprot}}</td>
+                        <td>{{row.organism}}</td>
+                        <td>{{row.substrate_kinetics}}</td>
+                        <td>{{row.temperature}}</td>
+                        <td>{{row.clean_mut_wt}}</td>
+                        <td>{{row.kcat_mut}}</td>
+                        <td>{{row.select_key}}</td>
+                        <td>{{row.Km_mut}}</td>
+                        <td>{{row.select_key_1}}</td>
+                        <td>{{row.kcat_wt}}</td>
+                        <td>{{row.Km_wt}}</td>
+                        <td>{{row.PDBID}}</td>
+                        <td>{{row.pdb_as}}</td>
+                        <td>{{row.Mutant}}</td>
+                        <td>{{row.dG_mut}}</td>
+                        <td>{{row.dG_wt}}</td>
+                        <td>{{row.ddG}}</td>
+                        <td>{{row.Y}}</td>
+                        <td>{{row.wt}}</td>
+                        <td>{{row.mut}}</td>
+                        <td>{{row.wt_aa}}</td>
+                        <td>{{row.mut_aa}}</td>
+                        <td>{{row.compare_key}}</td>
+                        <td>{{row.reaction_kcat}}</td>
+                    </tr>
+
+
+
+<!-- update the table -->
+<div id="modaledit{{row.id}}" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <h4 class="modal-title">Update Information</h4>
+         </div>
+         <div class="modal-body">
+            <form action="{{url_for('update')}}" method="POST">
+               <div class="form-group">
+                  <label>ec_number:</label>
+
+                  <input type="text" class="form-control" name="ec_number" value="{{row.ec_number}}">
+               </div>
+               <div class="form-group">
+                  <label>uniprot:</label>
+                  <input type="text" class="form-control" name="uniprot" value="{{row.uniprot}}">
+               </div>
+               <div class="form-group">
+                  <label>organism:</label>
+                  <input type="text" class="form-control" name="organism" value="{{row.organism}}">
+               </div>
+               <div class="form-group">
+                  <label>substrate_kinetics:</label>
+                  <input type="text" class="form-control" name="substrate_kinetics" value="{{row.substrate_kinetics}}">
+               </div>
+               <div class="form-group">
+                  <label>temperature:</label>
+                  <input type="text" class="form-control" name="temperature" value="{{row.temperature}}">
+               </div>
+               <div class="form-group">
+                  <label>clean_mut_wt:</label>
+                  <input type="text" class="form-control" name="clean_mut_wt" value="{{row.clean_mut_wt}}">
+               </div>
+               <div class="form-group">
+                  <label>kcat_mut:</label>
+                  <input type="text" class="form-control" name="kcat_mut" value="{{row.kcat_mut}}">
+               </div>
+               <div class="form-group">
+                  <label>select_key: PRIMARY KEY, NOT EDITABLE</label>
+                  <input type="text" class="form-control" name="select_key" value="{{row.select_key}}">
+               </div>
+               <div class="form-group">
+                  <label>Km_mut:</label>
+                  <input type="text" class="form-control" name="Km_mut" value="{{row.Km_mut}}">
+               </div>
+               <div class="form-group">
+                  <label>select_key_1:</label>
+                  <input type="text" class="form-control" name="select_key_1" value="{{row.select_key_1}}">
+               </div>
+               <div class="form-group">
+                  <label>kcat_wt:</label>
+                  <input type="text" class="form-control" name="kcat_wt" value="{{row.kcat_wt}}">
+               </div>
+               <div class="form-group">
+                  <label>Km_wt:</label>
+                  <input type="text" class="form-control" name="Km_wt" value="{{row.Km_wt}}">
+               </div>
+               <div class="form-group">
+                  <label>PDBID:</label>
+                  <input type="text" class="form-control" name="PDBID" value="{{row.PDBID}}">
+               </div>
+               <div class="form-group">
+                  <label>pdb_as:</label>
+                  <input type="text" class="form-control" name="pdb_as" value="{{row.pdb_as}}">
+               </div>
+               <div class="form-group">
+                  <label>Mutant:</label>
+                  <input type="text" class="form-control" name="Mutant" value="{{row.Mutant}}">
+               </div>
+               <div class="form-group">
+                  <label>dG_mut:</label>
+                  <input type="text" class="form-control" name="dG_mut" value="{{row.dG_mut}}">
+               </div>
+               <div class="form-group">
+                  <label>dG_wt:</label>
+                  <input type="text" class="form-control" name="dG_wt" value="{{row.dG_wt}}">
+               </div>
+               <div class="form-group">
+                  <label>ddG:</label>
+                  <input type="text" class="form-control" name="ddG" value="{{row.ddG}}">
+               </div>
+               <div class="form-group">
+                  <label>Y:</label>
+                  <input type="text" class="form-control" name="Y" value="{{row.Y}}">
+               </div>
+               <div class="form-group">
+                  <label>wt:</label>
+                  <input type="text" class="form-control" name="wt" value="{{row.wt}}">
+               </div>
+               <div class="form-group">
+                  <label>mut:</label>
+                  <input type="text" class="form-control" name="mut" value="{{row.mut}}">
+               </div>
+               <div class="form-group">
+                  <label>wt_aa:</label>
+                  <input type="text" class="form-control" name="wt_aa" value="{{row.wt_aa}}">
+               </div>
+               <div class="form-group">
+                  <label>mut_aa:</label>
+                  <input type="text" class="form-control" name="mut_aa" value="{{row.mut_aa}}">
+               </div>
+               <div class="form-group">
+                  <label>compare_key:</label>
+                  <input type="text" class="form-control" name="compare_key" value="{{row.compare_key}}">
+               </div>
+               <div class="form-group">
+                  <label>reaction_kcat:</label>
+                  <input type="text" class="form-control" name="reaction_kcat" value="{{row.reaction_kcat}}">
+               </div>
+               <div class="form-group">
+                  <button class="btn btn-primary" type="submit">Update</button>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+
+
+                    {% endfor %}
+
+
+                </table>
+
+
+            </div>
+
+
+
+
+
+<!-- add data to the table -->
+<div id="mymodal" class="modal fade" role="dialog">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+
+            <h4 class="modal-title">Add Data</h4>
+         </div>
+         <div class="modal-body">
+
+            <form action="{{url_for('insert')}}" method="POST">
+
+
+               <div class="form-group">
+                  <label>ec_number:</label>
+                  <input type="text" class="form-control" name="ec_number" required="1">
+               </div>
+               <div class="form-group">
+                  <label>uniprot:</label>
+                  <input type="text" class="form-control" name="uniprot" required="1">
+               </div>
+               <div class="form-group">
+                  <label>organism:</label>
+                  <input type="text" class="form-control" name="organism" required="1">
+               </div>
+               <div class="form-group">
+                  <label>substrate_kinetics:</label>
+                  <input type="text" class="form-control" name="substrate_kinetics" required="1">
+               </div>
+               <div class="form-group">
+                  <label>temperature:</label>
+                  <input type="text" class="form-control" name="temperature" required="1">
+               </div>
+               <div class="form-group">
+                  <label>clean_mut_wt:</label>
+                  <input type="text" class="form-control" name="clean_mut_wt" required="1">
+               </div>
+               <div class="form-group">
+                  <label>kcat_mut:</label>
+                  <input type="text" class="form-control" name="kcat_mut" required="1">
+               </div>
+               <div class="form-group">
+                  <label>select_key:</label>
+                  <input type="text" class="form-control" name="select_key" required="1">
+               </div>
+               <div class="form-group">
+                  <label>Km_mut:</label>
+                  <input type="text" class="form-control" name="Km_mut" required="1">
+               </div>
+               <div class="form-group">
+                  <label>select_key_1:</label>
+                  <input type="text" class="form-control" name="select_key_1" required="1">
+               </div>
+               <div class="form-group">
+                  <label>kcat_wt:</label>
+                  <input type="text" class="form-control" name="kcat_wt" required="1">
+               </div>
+               <div class="form-group">
+                  <label>Km_wt:</label>
+                  <input type="text" class="form-control" name="Km_wt" required="1">
+               </div>
+               <div class="form-group">
+                  <label>PDBID:</label>
+                  <input type="text" class="form-control" name="PDBID" required="1">
+               </div>
+               <div class="form-group">
+                  <label>pdb_as:</label>
+                  <input type="text" class="form-control" name="pdb_as" required="1">
+               </div>
+               <div class="form-group">
+                  <label>Mutant:</label>
+                  <input type="text" class="form-control" name="Mutant" required="1">
+               </div>
+               <div class="form-group">
+                  <label>dG_mut:</label>
+                  <input type="text" class="form-control" name="dG_mut" required="1">
+               </div>
+               <div class="form-group">
+                  <label>dG_wt:</label>
+                  <input type="text" class="form-control" name="dG_wt" required="1">
+               </div>
+               <div class="form-group">
+                  <label>ddG:</label>
+                  <input type="text" class="form-control" name="ddG" required="1">
+               </div>
+               <div class="form-group">
+                  <label>Y:</label>
+                  <input type="text" class="form-control" name="Y" required="1">
+               </div>
+               <div class="form-group">
+                  <label>wt:</label>
+                  <input type="text" class="form-control" name="wt" required="1">
+               </div>
+               <div class="form-group">
+                  <label>mut:</label>
+                  <input type="text" class="form-control" name="mut" required="1">
+               </div>
+               <div class="form-group">
+                  <label>wt_aa:</label>
+                  <input type="text" class="form-control" name="wt_aa" required="1">
+               </div>
+               <div class="form-group">
+                  <label>mut_aa:</label>
+                  <input type="text" class="form-control" name="mut_aa" required="1">
+               </div>
+               <div class="form-group">
+                  <label>compare_key:</label>
+                  <input type="text" class="form-control" name="compare_key" required="1">
+               </div>
+               <div class="form-group">
+                  <label>reaction_kcat:</label>
+                  <input type="text" class="form-control" name="reaction_kcat" required="1">
+               </div>
+               <div class="form-group">
+                  <button class="btn btn-primary" type="submit">Add Data</button>
+               </div>
+            </form>
+         </div>
+         <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+         </div>
+      </div>
+   </div>
+</div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+
+
+
+
+
+
